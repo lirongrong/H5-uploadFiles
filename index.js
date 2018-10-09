@@ -1,17 +1,13 @@
 var app = new Vue({
     el:'#app',
     data(){
-        return{
-            catId: 31,
+        return{ 
             model: {
                 id: 0,
-                imageList: [],
-            },
-            typeList: [],
-            propList: [],
-            provinceList: [],
-            province: 0,
-            cityList: []
+                fileList: [],
+                imgList:[]
+            }, 
+            loading:''
         }
     },
     created() {
@@ -38,8 +34,14 @@ var app = new Vue({
          * 删除附件
          */
         deleteFile(index) {
-            this.model.imageList.splice(index);
+            this.model.fileList.splice(index,1);
         }, 
+        /**
+         * 删除图片
+         */
+        deleteImg(index){
+            this.model.imgList.splice(index,1);
+        },
         /**
          * 封装上传附件的方法
          */
@@ -48,7 +50,7 @@ var app = new Vue({
             var defaults = {
                 folder: "default",
                 size: 3,
-                type: ['image', 'word', 'pdf', 'zip', 'rar', 'sheet', 'text'],
+                type: ['image', 'word', 'pdf', 'zip', 'rar', 'sheet', 'text','log','psd'],
                 maxWidth: Number, //最大宽度
                 maxHeight: Number, //最大高度
                 success: false,
@@ -57,10 +59,10 @@ var app = new Vue({
             var opts = $.extend(defaults, options);
             var files = event.target.files; 
             for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                console.log(file);
+                var file = files[i]; 
+                //上传附件大于3M
                 if (file.size > defaults.size * 1024 * 1024) {
-                    alert("文件【" + file.name + "】大于" + defaults.size + "M!");
+                    that.showToast("文件【" + file.name + "】大于" + defaults.size + "M!");
                     return;
                 }
                 var valiType = false;
@@ -72,44 +74,34 @@ var app = new Vue({
                    }
                 }
                 if (!valiType) {
-                   alert("上传文件类型不正确！");
+                   that.showToast("上传文件类型不正确！");
                    return;
-                }
-                if (opts.beforeSend) {
-                    opts.beforeSend();
-                }
- 
+                }  
                 var reader = new FileReader(); 
+                var type = file.type.split('/')[0];
                 reader.readAsDataURL(file);
                 reader.onloadstart = function () {
                     //用以在上传前加入一些事件或效果，如载入中...的动画效果
+                    that.loading = 'loading';
                 };
-                var type = file.type.split('/')[0];
-                if (type != 'image') {
-                    reader.onloadend = function () {
-                        
-                        
-                    }
-                }
-                else {
-                    reader.onloadend = function (e) { 
-                        var dataURL = this.result;  
-                        var imaged = new Image();
-                        imaged.src = dataURL;
-                        imaged.onload = function () {
-                            var img = this;
-                            console.log(img);
-                            //利用canvas对图片进行压缩
-                            var getImg = that.getBase64Image(img,{
-                                maxWidth:1000,
-                                maxHeight:1000
-                            });
-                            var lastImg = new Image();
-                            lastImg.src = getImg.dataURL;
-                            console.log(lastImg.dataURL );
-                            document.querySelector('#preview').appendChild(lastImg)
-                        };  
-                    };
+                reader.onloadend = function(){
+                    if(type != 'image')
+                        that.model.fileList.push(file);
+                    that.loading = '';
+                    var dataURL = this.result;  
+                    var imaged = new Image();
+                    imaged.src = dataURL;
+                    imaged.onload = function () {
+                        var img = this; 
+                        //利用canvas对图片进行压缩
+                        var getImg = that.getBase64Image(img,{
+                            maxWidth:1000,
+                            maxHeight:1000
+                        });
+                        that.model.imgList.push({
+                            src:getImg.dataURL
+                        }) 
+                    };   
                 } 
             }
         },
@@ -162,6 +154,16 @@ var app = new Vue({
             //回调函数用以向数据库提交数据
             var base64 = dataURL.substr(dataURL.indexOf(",") + 1);
             return {dataURL,base64};
+        },
+        /**
+         * 提示信息
+         */
+        showToast : function (msg) {
+            var objToast = "<div class='rr_toast'>" + msg + "</div>"
+            $(document.body).append(objToast);
+            setTimeout(function () {
+                $('.rr_toast').remove();
+            }, 1000)
         }
     }
 })

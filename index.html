@@ -10,29 +10,34 @@
     <!-- 开发环境版本，包含了有帮助的命令行警告 -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <style>
-         #preview img{ width: 100px; height: 100px; margin-right:10px; border-radius: 4px; border:1px solid #f5f5f5;}
+         #preview img{ width: 60px; height: 60px; margin-right:5px; border-radius: 4px; border:1px solid #f5f5f5;}
+         .icon-shanchu{ right:-2px; top:-10px; font-size: 30px; background: #fff; border-radius: 50%; color: #666;}
     </style>
 </head>
 <body>
-    <div id="app">
+    <div style="padding:6px 10px;" id="app">
+        <div class="flex flex_align_center">
+            <span class="flex_item">请点击按钮上传图片</span>
+            <a class="rr_btn_default pr" style="overflow:hidden;">
+                <span class="btn_primary dib">上传</span>
+                <input type="file" multiple="multiple" v-on:change="chooseImage" placeholder="上传图片" class="pa" style="left:0; right:0; top:0;bottom:0; opacity:0;" />
+            </a>
+        </div>
+        <!--上传除图片外的其他附件-->
         <ul>
-            <li style="padding:6px 10px;">
-                <div class="flex flex_align_center">
-                    <span class="flex_item">请点击按钮上传图片</span>
-                    <a class="rr_btn_default pr" style="overflow:hidden;">
-                        <span class="btn_primary dib">上传</span>
-                        <input type="file" multiple="multiple" v-on:change="chooseImage" placeholder="上传图片" class="pa" style="left:0; right:0; top:0;bottom:0; opacity:0;" />
-                    </a>
-                </div>
-                <ul>
-                    <li class="flex flex_align_center" style="padding:6px 0;" v-for="(item,index) in model.imageList" :key="index">
-                        <span class="flex_item">{{item.name}}</span>
-                        <a title="删除" class="ml10" @click="deleteFile(index)">删除</a> 
-                    </li>
-                </ul>  
-                <div id="preview"></div>
+            <li class="flex flex_align_center" style="padding:6px 0;" v-for="(item,index) in model.fileList" :key="index">
+                <span class="flex_item">{{item.name}}</span>
+                <a title="删除" class="ml10" @click="deleteFile(index)">删除</a> 
             </li>
-        </ul>
+        </ul> 
+        <!--上传图片--> 
+        <ul id="preview" class="flex flex_wrap">
+            <li v-for="(item,index) in model.imgList" :key="index" style="flex-basis: 20%;" class="pr">
+                <img :src="item.src" alt=""/>
+                <i class="iconfont icon-shanchu pa" @click="deleteImg(index)"></i>
+            </li>
+        </ul> 
+        <div>{{loading}}</div>
     </div>
     <script src="index.js"></script>
 </body>
