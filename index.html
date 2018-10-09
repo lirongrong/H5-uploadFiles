@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>uploadFiles</title>
+    <link href="base.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+         #preview img{ width: 100px; height: 100px; margin-right:10px; border-radius: 4px; border:1px solid #f5f5f5;}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <ul>
+            <li style="padding:6px 10px;">
+                <div class="flex flex_align_center">
+                    <span class="flex_item">请点击按钮上传图片</span>
+                    <a class="rr_btn_default pr" style="overflow:hidden;">
+                        <span class="btn_primary dib">上传</span>
+                        <input type="file" multiple="multiple" v-on:change="chooseImage" placeholder="上传图片" class="pa" style="left:0; right:0; top:0;bottom:0; opacity:0;" />
+                    </a>
+                </div>
+                <ul>
+                    <li class="flex flex_align_center" style="padding:6px 0;" v-for="(item,index) in model.imageList" :key="index">
+                        <span class="flex_item">{{item.name}}</span>
+                        <a title="删除" class="ml10" @click="deleteFile(index)">删除</a> 
+                    </li>
+                </ul>  
+                <div id="preview"></div>
+            </li>
+        </ul>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
